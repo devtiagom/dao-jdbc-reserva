@@ -4,34 +4,36 @@ import db.DbException;
 import db.DbIntegrityException;
 import db.JDBCConnection;
 import domain.Modalidade;
+import domain.TipoPasseio;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ModalidadeDao implements DAO<Modalidade> {
+public class TipoPasseioDAO implements DAO<TipoPasseio> {
 
     private Connection conn;
 
-    public ModalidadeDao(Connection conn) {
+    public TipoPasseioDAO(Connection conn) {
         this.conn = conn;
     }
 
     @Override
-    public void save(Modalidade domain) {
+    public void save(TipoPasseio domain) {
         PreparedStatement st = null;
         ResultSet rs = null;
 
-        String sql = "INSERT INTO modalidade (nome) VALUES (?)";
+        String sql = "INSERT INTO tipo_passeio (nome_passeio, descricao_passeio) VALUES (?, ?)";
 
         try {
             st = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            st.setString(1, domain.getNome());
+            st.setString(1, domain.getNomePasseio());
+            st.setString(2, domain.getDescricaoPasseio());
 
             int rowsAffected =  st.executeUpdate();
             if (rowsAffected > 0) {
                 rs = st.getGeneratedKeys();
-                if (rs.next()) domain.setIdModalidade(rs.getLong(1));
+                if (rs.next()) domain.setIdTipoPasseio(rs.getLong(1));
             } else {
                 throw new DbException("Unexpected error! No rows affected!");
             }
@@ -44,21 +46,24 @@ public class ModalidadeDao implements DAO<Modalidade> {
     }
 
     @Override
-    public Modalidade saveAndCheck(Modalidade domain) throws DbException {
+    public TipoPasseio saveAndCheck(TipoPasseio domain) {
         this.save(domain);
-        return this.findById(domain.getIdModalidade());
+        return this.findById(domain.getIdTipoPasseio());
     }
 
     @Override
-    public void update(Modalidade domain) {
+    public void update(TipoPasseio domain) {
         PreparedStatement st = null;
 
-        String sql = "UPDATE modalidade SET nome = ? WHERE id_modalidade = ?";
+        String sql = "UPDATE tipo_passeio " +
+                "SET nome_passeio = ?, descricao_passeio = ? " +
+                "WHERE id_tipo_passeio = ?";
 
         try {
             st = conn.prepareStatement(sql);
-            st.setString(1, domain.getNome());
-            st.setLong(2, domain.getIdModalidade());
+            st.setString(1, domain.getNomePasseio());
+            st.setString(2, domain.getDescricaoPasseio());
+            st.setLong(3, domain.getIdTipoPasseio());
             st.execute();
         } catch (SQLException e) {
             throw new DbException(e.getMessage());
@@ -68,20 +73,20 @@ public class ModalidadeDao implements DAO<Modalidade> {
     }
 
     @Override
-    public Modalidade updateAndCheck(Modalidade domain) throws DbException {
+    public TipoPasseio updateAndCheck(TipoPasseio domain) {
         this.update(domain);
-        return this.findById(domain.getIdModalidade());
+        return this.findById(domain.getIdTipoPasseio());
     }
 
     @Override
-    public void delete(Modalidade domain) {
+    public void delete(TipoPasseio domain) {
         PreparedStatement st = null;
 
-        String sql = "DELETE FROM modalidade WHERE id_modalidade = ?";
+        String sql = "DELETE FROM tipo_passeio WHERE id_tipo_passeio = ?";
 
         try {
             st = conn.prepareStatement(sql);
-            st.setLong(1, domain.getIdModalidade());
+            st.setLong(1, domain.getIdTipoPasseio());
             st.execute();
         } catch (SQLException e) {
             throw new DbIntegrityException(e.getMessage());
@@ -91,12 +96,12 @@ public class ModalidadeDao implements DAO<Modalidade> {
     }
 
     @Override
-    public Modalidade findById(Long domainId) {
-        Modalidade modalidade = null;
+    public TipoPasseio findById(Long domainId) {
+        TipoPasseio tipoPasseio = null;
         PreparedStatement st = null;
         ResultSet rs = null;
 
-        String sql = "SELECT * FROM modalidade WHERE id_modalidade = ?";
+        String sql = "SELECT * FROM tipo_passeio WHERE id_tipo_passeio = ?";
 
         try {
             st = this.conn.prepareStatement(sql);
@@ -104,9 +109,10 @@ public class ModalidadeDao implements DAO<Modalidade> {
             rs = st.executeQuery();
 
             if (rs.next()) {
-                modalidade = new Modalidade();
-                modalidade.setIdModalidade(rs.getLong("id_modalidade"));
-                modalidade.setNome(rs.getString("nome"));
+                tipoPasseio = new TipoPasseio();
+                tipoPasseio.setIdTipoPasseio(rs.getLong("id_tipo_passeio"));
+                tipoPasseio.setNomePasseio(rs.getString("nome_passeio"));
+                tipoPasseio.setDescricaoPasseio(rs.getString("descricao_passeio"));
             }
         } catch (SQLException e) {
             throw new DbException(e.getMessage());
@@ -115,27 +121,28 @@ public class ModalidadeDao implements DAO<Modalidade> {
             JDBCConnection.closeStatement(st);
         }
 
-        return modalidade;
+        return tipoPasseio;
     }
 
     @Override
-    public List<Modalidade> findAll() {
-        List<Modalidade> modalidades = new ArrayList<>();
-        Modalidade modalidade = null;
+    public List<TipoPasseio> findAll() {
+        List<TipoPasseio> tiposPasseios = new ArrayList<>();
+        TipoPasseio tipoPasseio = null;
         PreparedStatement st = null;
         ResultSet rs = null;
 
-        String sql = "SELECT * FROM modalidade";
+        String sql = "SELECT * FROM tipo_passeio";
 
         try {
             st = this.conn.prepareStatement(sql);
             rs = st.executeQuery();
 
             while (rs.next()) {
-                modalidade = new Modalidade();
-                modalidade.setIdModalidade(rs.getLong("id_modalidade"));
-                modalidade.setNome(rs.getString("nome"));
-                modalidades.add(modalidade);
+                tipoPasseio = new TipoPasseio();
+                tipoPasseio.setIdTipoPasseio(rs.getLong("id_tipo_passeio"));
+                tipoPasseio.setNomePasseio(rs.getString("nome_passeio"));
+                tipoPasseio.setDescricaoPasseio(rs.getString("descricao_passeio"));
+                tiposPasseios.add(tipoPasseio);
             }
         } catch (SQLException e) {
             throw new DbException(e.getMessage());
@@ -144,6 +151,6 @@ public class ModalidadeDao implements DAO<Modalidade> {
             JDBCConnection.closeStatement(st);
         }
 
-        return modalidades;
+        return tiposPasseios;
     }
 }

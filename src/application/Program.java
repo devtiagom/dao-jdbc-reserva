@@ -2,6 +2,7 @@ package application;
 
 import dao.DAO;
 import dao.DAOFactory;
+import db.JDBCConnection;
 import domain.Modalidade;
 import domain.TipoPasseio;
 import domain.Viajante;
@@ -16,7 +17,7 @@ public class Program {
 	public static void main(String[] args) {
 
 		// Tabela Modalidade
-		System.out.println("TESTE TABELA MODALIDADE");
+		/*System.out.println("TESTE TABELA MODALIDADE");
 		Modalidade modalidade = null;
 		Modalidade modalidadeFromDB = null;
 		DAO<Modalidade> modalidadeDAO = DAOFactory.createModalidadeDAO();
@@ -26,32 +27,26 @@ public class Program {
 		modalidadeFromDB = modalidadeDAO.findById((long) 4);
 		System.out.println(modalidadeFromDB);
 
-
 		// Listando todas modalidades
 		System.out.println("\n--------------- Listando todas modalidades ---------------");
 		List<Modalidade> modalidades = modalidadeDAO.findAll();
 		modalidades.forEach(System.out::println);
 
-
 		// Inserindo uma modalidade
 		System.out.println("\n--------------- Inserindo uma modalidade ---------------");
 		modalidade = new Modalidade("Passeio de helicóptero");
-
 		//modalidadeDAO.save(modalidade);
 		modalidadeFromDB = modalidadeDAO.saveAndCheck(modalidade);
 		System.out.println("Modalidade salva no banco = " + modalidadeFromDB);
-
 
 		// Atualizando uma modalidade
 		System.out.println("\n--------------- Atualizando uma modalidade ---------------");
 		modalidade = modalidadeDAO.findById((long) 6);
 		System.out.println("Modalidade original = " + modalidade);
 		modalidade.setNome("Museu");
-
 		//modalidadeDAO.update(modalidade);
 		modalidadeFromDB = modalidadeDAO.updateAndCheck(modalidade);
 		System.out.println("Modalidade atualizada = " + modalidadeFromDB);
-
 
 		// Deletando uma modalidade
 		System.out.println("\n--------------- Deletando uma modalidade ---------------");
@@ -59,8 +54,52 @@ public class Program {
 		System.out.println("Modalidade a ser deletada = " + modalidade);
 		modalidadeDAO.delete(modalidade);
 
+		// Fechando conexão
+		JDBCConnection.closeConnection();*/
 
+		/***************************************************************************************************/
 
+		// Tabela Tipo de Passeio
+		System.out.println("TESTE TABELA TIPO_PASSEIO");
+		TipoPasseio tipoPasseio = null;
+		TipoPasseio tipoPasseioFromDB = null;
+		DAO<TipoPasseio> tipoPasseioDAO = DAOFactory.createTipoPasseioDAO();
+
+		// Listando um tipo de passeio
+		System.out.println("\n--------------- Listando um tipo de passeio ---------------");
+		tipoPasseioFromDB = tipoPasseioDAO.findById((long) 3);
+		System.out.println(tipoPasseioFromDB);
+
+		// Listando todos tipos de passeios
+		System.out.println("\n--------------- Listando todos tipos de passeios ---------------");
+		List<TipoPasseio> tiposPasseios = tipoPasseioDAO.findAll();
+		tiposPasseios.forEach(System.out::println);
+
+		// Inserindo um tipo de passeio
+		System.out.println("\n--------------- Inserindo um tipo de passeio ---------------");
+		tipoPasseio = new TipoPasseio("Em bando", "Passeio para um bando de gente");
+//		tipoPasseioDAO.save(tipoPasseio);
+		tipoPasseioFromDB = tipoPasseioDAO.saveAndCheck(tipoPasseio);
+		System.out.println("Tipo de passeio salvo no banco = " + tipoPasseioFromDB);
+
+		// Atualizando um tipo de passeio
+		System.out.println("\n--------------- Atualizando um tipo de passeio ---------------");
+		tipoPasseio = tipoPasseioDAO.findById((long) 1);
+		System.out.println("Tipo de passeio original = " + tipoPasseio);
+		tipoPasseio.setNomePasseio("Privativo");
+		tipoPasseio.setDescricaoPasseio("Passeio somente para pessoa ou casal");
+//		tipoPasseioDAO.update(tipoPasseio);
+		tipoPasseioFromDB = tipoPasseioDAO.updateAndCheck(tipoPasseio);
+		System.out.println("Tipo de passeio atualizad0 = " + tipoPasseioFromDB);
+
+		// Deletando um tipo de passeio
+		System.out.println("\n--------------- Deletando um tipo de passeio ---------------");
+		tipoPasseio = tipoPasseioDAO.findById((long) 4);
+		System.out.println("Tipo de passeio a ser deletado = " + tipoPasseio);
+		tipoPasseioDAO.delete(tipoPasseio);
+
+		// Fechando conexão
+		JDBCConnection.closeConnection();
 
 
 
