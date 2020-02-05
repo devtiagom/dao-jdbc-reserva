@@ -1,6 +1,7 @@
 package dao;
 
 import db.DbException;
+import db.DbIntegrityException;
 import db.JDBCConnection;
 import domain.Modalidade;
 
@@ -43,6 +44,12 @@ public class ModalidadeDao implements DAO<Modalidade> {
     }
 
     @Override
+    public Modalidade saveAndCheck(Modalidade domain) throws DbException {
+        this.save(domain);
+        return this.findById(domain.getIdModalidade());
+    }
+
+    @Override
     public void update(Modalidade domain) {
         PreparedStatement st = null;
 
@@ -61,6 +68,12 @@ public class ModalidadeDao implements DAO<Modalidade> {
     }
 
     @Override
+    public Modalidade updateAndCheck(Modalidade domain) throws DbException {
+        this.update(domain);
+        return this.findById(domain.getIdModalidade());
+    }
+
+    @Override
     public void delete(Modalidade domain) {
         PreparedStatement st = null;
 
@@ -71,7 +84,7 @@ public class ModalidadeDao implements DAO<Modalidade> {
             st.setLong(1, domain.getIdModalidade());
             st.execute();
         } catch (SQLException e) {
-            throw new DbException(e.getMessage());
+            throw new DbIntegrityException(e.getMessage());
         } finally {
             JDBCConnection.closeStatement(st);
         }

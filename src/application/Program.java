@@ -15,31 +15,57 @@ public class Program {
 
 	public static void main(String[] args) {
 
-		// Listando uma modalidade
-		System.out.println("Listando uma modalidade");
+		// Tabela Modalidade
+		System.out.println("TESTE TABELA MODALIDADE");
+		Modalidade modalidade = null;
+		Modalidade modalidadeFromDB = null;
 		DAO<Modalidade> modalidadeDAO = DAOFactory.createModalidadeDAO();
-		Modalidade modalidade = modalidadeDAO.findById((long) 11);
-		System.out.println(modalidade);
+
+		// Listando uma modalidade
+		System.out.println("\n--------------- Listando uma modalidade ---------------");
+		modalidadeFromDB = modalidadeDAO.findById((long) 4);
+		System.out.println(modalidadeFromDB);
+
 
 		// Listando todas modalidades
-		System.out.println("\nListando todas modalidades");
+		System.out.println("\n--------------- Listando todas modalidades ---------------");
 		List<Modalidade> modalidades = modalidadeDAO.findAll();
 		modalidades.forEach(System.out::println);
 
+
 		// Inserindo uma modalidade
-		//System.out.println("\nInserindo uma modalidade");
-		//modalidade = new Modalidade("Bicicleta");
+		System.out.println("\n--------------- Inserindo uma modalidade ---------------");
+		modalidade = new Modalidade("Passeio de helicóptero");
+
 		//modalidadeDAO.save(modalidade);
-		//System.out.println("Inserted! New id = " + modalidade.getIdModalidade());
+		modalidadeFromDB = modalidadeDAO.saveAndCheck(modalidade);
+		System.out.println("Modalidade salva no banco = " + modalidadeFromDB);
+
 
 		// Atualizando uma modalidade
-		//System.out.println("\nAtualizando uma modalidade");
-		//modalidade.setNome("Passeio de trêm");
+		System.out.println("\n--------------- Atualizando uma modalidade ---------------");
+		modalidade = modalidadeDAO.findById((long) 6);
+		System.out.println("Modalidade original = " + modalidade);
+		modalidade.setNome("Museu");
+
 		//modalidadeDAO.update(modalidade);
+		modalidadeFromDB = modalidadeDAO.updateAndCheck(modalidade);
+		System.out.println("Modalidade atualizada = " + modalidadeFromDB);
+
 
 		// Deletando uma modalidade
-		System.out.println("\nDeletando uma modalidade");
+		System.out.println("\n--------------- Deletando uma modalidade ---------------");
+		modalidade = modalidadeDAO.findById((long) 8);
+		System.out.println("Modalidade a ser deletada = " + modalidade);
 		modalidadeDAO.delete(modalidade);
+
+
+
+
+
+
+
+
 
 		/*Locale.setDefault(Locale.US);
 
