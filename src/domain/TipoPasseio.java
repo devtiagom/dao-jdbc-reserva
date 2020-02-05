@@ -4,9 +4,9 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class TipoPasseio implements Serializable {
-	
+
 	private static final long serialVersionUID = 1L;
-	
+
 	private Long idTipoPasseio;
 	private String nomePasseio;
 	private String descricaoPasseio;
