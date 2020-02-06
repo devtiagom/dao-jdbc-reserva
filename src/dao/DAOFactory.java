@@ -1,6 +1,7 @@
 package dao;
 
 import db.JDBCConnection;
+import domain.Estado;
 import domain.Modalidade;
 import domain.Pais;
 import domain.TipoPasseio;
@@ -16,4 +17,6 @@ public class DAOFactory {
     }
 
     public static DAO<Pais> createPaisDAO() { return new PaisDAO(JDBCConnection.getConnection()); }
+
+    public static DAO<Estado> createEstadoDAO() { return new EstadoDAO(JDBCConnection.getConnection()); }
 }

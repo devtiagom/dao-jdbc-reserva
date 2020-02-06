@@ -3,33 +3,37 @@ package dao;
 import db.DbException;
 import db.DbIntegrityException;
 import db.JDBCConnection;
+import domain.Estado;
 import domain.Pais;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class PaisDAO implements DAO<Pais> {
+public class EstadoDAO implements DAO<Estado> {
 
     private Connection conn;
 
-    public PaisDAO(Connection conn) { this.conn = conn; }
+    public EstadoDAO(Connection conn) { this.conn = conn; }
 
     @Override
-    public void save(Pais domain) {
+    public void save(Estado domain) {
         PreparedStatement st = null;
         ResultSet rs = null;
 
-        String sql = "INSERT INTO pais (nome_pais) VALUES (?)";
+        String sql = "INSERT INTO estado (nome_estado, id_pais) VALUES (?, ?)";
 
         try {
             st = this.conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            st.setString(1, domain.getNomePais());
+            st.setString(1, domain.getNomeEstado());
+            st.setLong(2, domain.getPais().getIdPais());
 
             int rowsAffected =  st.executeUpdate();
             if (rowsAffected > 0) {
                 rs = st.getGeneratedKeys();
-                if (rs.next()) domain.setIdPais(rs.getLong(1));
+                if (rs.next()) domain.setIdEstado(rs.getLong(1));
             } else {
                 throw new DbException("Unexpected error! No rows affected!");
             }
@@ -42,21 +46,24 @@ public class PaisDAO implements DAO<Pais> {
     }
 
     @Override
-    public Pais saveAndCheck(Pais domain) {
+    public Estado saveAndCheck(Estado domain) {
         this.save(domain);
-        return this.findById(domain.getIdPais());
+        return this.findById(domain.getIdEstado());
     }
 
     @Override
-    public void update(Pais domain) {
+    public void update(Estado domain) {
         PreparedStatement st = null;
 
-        String sql = "UPDATE pais SET nome_pais = ? WHERE id_pais = ?";
+        String sql = "UPDATE estado " +
+                "SET nome_estado = ?, id_pais = ? " +
+                "WHERE id_estado = ?";
 
         try {
             st = this.conn.prepareStatement(sql);
-            st.setString(1, domain.getNomePais());
-            st.setLong(2, domain.getIdPais());
+            st.setString(1, domain.getNomeEstado());
+            st.setLong(2, domain.getPais().getIdPais());
+            st.setLong(3, domain.getIdEstado());
             st.execute();
         } catch (SQLException e) {
             throw new DbException(e.getMessage());
@@ -66,20 +73,20 @@ public class PaisDAO implements DAO<Pais> {
     }
 
     @Override
-    public Pais updateAndCheck(Pais domain) {
+    public Estado updateAndCheck(Estado domain) {
         this.update(domain);
-        return this.findById(domain.getIdPais());
+        return this.findById(domain.getIdEstado());
     }
 
     @Override
-    public void delete(Pais domain) {
+    public void delete(Estado domain) {
         PreparedStatement st = null;
 
-        String sql = "DELETE FROM pais WHERE id_pais = ?";
+        String sql = "DELETE FROM estado WHERE id_estado = ?";
 
         try {
             st = this.conn.prepareStatement(sql);
-            st.setLong(1, domain.getIdPais());
+            st.setLong(1, domain.getIdEstado());
             st.execute();
         } catch (SQLException e) {
             throw new DbIntegrityException(e.getMessage());
@@ -89,12 +96,17 @@ public class PaisDAO implements DAO<Pais> {
     }
 
     @Override
-    public Pais findById(Long domainId) {
+    public Estado findById(Long domainId) {
+        Estado estado = null;
         Pais pais = null;
+
         PreparedStatement st = null;
         ResultSet rs = null;
 
-        String sql = "SELECT * FROM pais WHERE id_pais = ?";
+        String sql = "SELECT e.*, p.nome_pais " +
+                "FROM estado AS e INNER JOIN pais AS p " +
+                "ON e.id_pais = p.id_pais " +
+                "WHERE e.id_estado = ?";
 
         try {
             st = this.conn.prepareStatement(sql);
@@ -105,6 +117,11 @@ public class PaisDAO implements DAO<Pais> {
                 pais = new Pais();
                 pais.setIdPais(rs.getLong("id_pais"));
                 pais.setNomePais(rs.getString("nome_pais"));
+
+                estado = new Estado();
+                estado.setIdEstado(rs.getLong("id_estado"));
+                estado.setNomeEstado(rs.getString("nome_estado"));
+                estado.setPais(pais);
             }
         } catch (SQLException e) {
             throw new DbException(e.getMessage());
@@ -113,27 +130,46 @@ public class PaisDAO implements DAO<Pais> {
             JDBCConnection.closeStatement(st);
         }
 
-        return pais;
+        return estado;
     }
 
     @Override
-    public List<Pais> findAll() {
-        List<Pais> paises = new ArrayList<>();
+    public List<Estado> findAll() {
+        Estado estado = null;
         Pais pais = null;
+        List<Estado> estados = new ArrayList<>();
+        Map<Long, Pais> paisMap = new HashMap<>();
+
         PreparedStatement st = null;
         ResultSet rs = null;
 
-        String sql = "SELECT * FROM pais";
+        String sql = "SELECT e.*, p.nome_pais " +
+                "FROM estado AS e INNER JOIN pais AS p " +
+                "ON e.id_pais = p.id_pais " +
+                "ORDER BY e.nome_estado";
 
         try {
             st = this.conn.prepareStatement(sql);
             rs = st.executeQuery();
 
             while (rs.next()) {
-                pais = new Pais();
-                pais.setIdPais(rs.getLong("id_pais"));
-                pais.setNomePais(rs.getString("nome_pais"));
-                paises.add(pais);
+                long idPais = rs.getLong("id_pais");
+                pais = paisMap.get(idPais);
+
+                if (pais == null) {
+                    pais = new Pais();
+                    pais.setIdPais(idPais);
+                    pais.setNomePais(rs.getString("nome_pais"));
+
+                    paisMap.put(idPais, pais);
+                }
+
+                estado = new Estado();
+                estado.setIdEstado(rs.getLong("id_estado"));
+                estado.setNomeEstado(rs.getString("nome_estado"));
+                estado.setPais(pais);
+
+                estados.add(estado);
             }
         } catch (SQLException e) {
             throw new DbException(e.getMessage());
@@ -142,6 +178,6 @@ public class PaisDAO implements DAO<Pais> {
             JDBCConnection.closeStatement(st);
         }
 
-        return paises;
+        return estados;
     }
 }

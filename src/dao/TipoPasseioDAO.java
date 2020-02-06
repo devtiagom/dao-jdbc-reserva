@@ -3,7 +3,6 @@ package dao;
 import db.DbException;
 import db.DbIntegrityException;
 import db.JDBCConnection;
-import domain.Modalidade;
 import domain.TipoPasseio;
 
 import java.sql.*;
@@ -26,7 +25,7 @@ public class TipoPasseioDAO implements DAO<TipoPasseio> {
         String sql = "INSERT INTO tipo_passeio (nome_passeio, descricao_passeio) VALUES (?, ?)";
 
         try {
-            st = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            st = this.conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             st.setString(1, domain.getNomePasseio());
             st.setString(2, domain.getDescricaoPasseio());
 
@@ -60,7 +59,7 @@ public class TipoPasseioDAO implements DAO<TipoPasseio> {
                 "WHERE id_tipo_passeio = ?";
 
         try {
-            st = conn.prepareStatement(sql);
+            st = this.conn.prepareStatement(sql);
             st.setString(1, domain.getNomePasseio());
             st.setString(2, domain.getDescricaoPasseio());
             st.setLong(3, domain.getIdTipoPasseio());
@@ -85,7 +84,7 @@ public class TipoPasseioDAO implements DAO<TipoPasseio> {
         String sql = "DELETE FROM tipo_passeio WHERE id_tipo_passeio = ?";
 
         try {
-            st = conn.prepareStatement(sql);
+            st = this.conn.prepareStatement(sql);
             st.setLong(1, domain.getIdTipoPasseio());
             st.execute();
         } catch (SQLException e) {

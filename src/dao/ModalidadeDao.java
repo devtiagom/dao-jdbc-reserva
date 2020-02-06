@@ -25,7 +25,7 @@ public class ModalidadeDao implements DAO<Modalidade> {
         String sql = "INSERT INTO modalidade (nome) VALUES (?)";
 
         try {
-            st = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            st = this.conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             st.setString(1, domain.getNome());
 
             int rowsAffected =  st.executeUpdate();
@@ -56,7 +56,7 @@ public class ModalidadeDao implements DAO<Modalidade> {
         String sql = "UPDATE modalidade SET nome = ? WHERE id_modalidade = ?";
 
         try {
-            st = conn.prepareStatement(sql);
+            st = this.conn.prepareStatement(sql);
             st.setString(1, domain.getNome());
             st.setLong(2, domain.getIdModalidade());
             st.execute();
@@ -80,7 +80,7 @@ public class ModalidadeDao implements DAO<Modalidade> {
         String sql = "DELETE FROM modalidade WHERE id_modalidade = ?";
 
         try {
-            st = conn.prepareStatement(sql);
+            st = this.conn.prepareStatement(sql);
             st.setLong(1, domain.getIdModalidade());
             st.execute();
         } catch (SQLException e) {
